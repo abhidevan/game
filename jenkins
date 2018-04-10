@@ -1,0 +1,37 @@
+pipeline {
+  agent none
+  stages {
+    stage('Docker Build') {
+      agent any
+      steps {
+        sh 'docker build -t abhidevan/game .'
+      }
+    }
+    stage('Docker Push') {
+      agent any
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+          sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+          sh 'docker push abhidevan/game'
+	}
+      }
+    }
+    stage('Deleting the old builds and services') {
+	    agent any
+	    steps{
+		    sh 'kubectl delete deployments game'
+		    sh 'kubectl delete services game' 
+		    }
+		 }
+	
+	stage('Deploying New Build To Kubernetes') {
+	    agent any
+	    steps{   
+	            sh 'docker pull abhidevan/game'
+	    	    sh 'kubectl create deployment game --image abhidevan/game'
+		    sh 'kubectl set image deployments/kube game=abhidevan/game'
+		    sh 'kubectl create service nodeport game --tcp=80:80'
+	    }
+      }
+  }
+}
