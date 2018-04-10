@@ -28,7 +28,7 @@ pipeline {
 	    agent any
 	    steps{   
 	            sh 'docker pull abhidevan/game'
-	    	    sh 'kubectl create deployment game --image abhidevan/game'
+	    	    sh 'kubectl create deployments game --image abhidevan/game'
 		    sh 'kubectl set image deployments/game game=abhidevan/game'
 		    sh 'kubectl create service nodeport game --tcp=80:80'
 	    }
