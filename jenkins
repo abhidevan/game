@@ -16,15 +16,7 @@ pipeline {
 	}
       }
     }
-    stage('Deleting the old builds and services') {
-	    agent any
-	    steps{
-		   
-		    sh 'kubectl delete services game' 
-		    }
-		 }
-	
-	stage('Deploying New Build To Kubernetes') {
+    stage('Deploying New Build To Kubernetes') {
 	    agent any
 	    steps{   
 	            sh 'docker pull abhidevan/game'
